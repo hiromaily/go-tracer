@@ -1,2 +1,2 @@
 # go-tracer
-opnetracing
+[OpenTracing](https://opentracing.io/)
