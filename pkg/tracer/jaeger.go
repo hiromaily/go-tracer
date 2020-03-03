@@ -1,7 +1,9 @@
 package tracer
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/uber/jaeger-client-go"
@@ -22,6 +24,12 @@ func StartJaegerTracers(conf *config.TracerDetailConfig) opentracing.Tracer {
 		jType = jaeger.SamplerTypeProbabilistic
 	}
 
+	//NODE_HOST
+	endpoint := conf.CollectorEndpoint
+	if os.Getenv("NODE_HOST") != "" {
+		endpoint = fmt.Sprintf("http://%s:14268/api/traces", os.Getenv("NODE_HOST"))
+	}
+
 	cfg := jaegercfg.Configuration{
 		ServiceName: conf.ServiceName + suffix,
 		Sampler: &jaegercfg.SamplerConfig{
@@ -29,7 +37,7 @@ func StartJaegerTracers(conf *config.TracerDetailConfig) opentracing.Tracer {
 			Param: probability, // if value is 1, it always records
 		},
 		Reporter: &jaegercfg.ReporterConfig{
-			CollectorEndpoint: conf.CollectorEndpoint,
+			CollectorEndpoint: endpoint,
 		},
 	}
 
